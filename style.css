@@ -1,0 +1,91 @@
+# style.css
+# ============================================================
+# Usage:
+#   このファイルは index.html から読み込むCSSです。
+# ============================================================
+
+:root {
+  color-scheme: dark;
+  --bg: #0b1120;
+  --panel: #111b2e;
+  --panel-soft: #172338;
+  --line: #29384f;
+  --text: #edf3fb;
+  --muted: #9aabc2;
+  --blue: #60a5fa;
+  --green: #34d399;
+  --yellow: #fbbf24;
+  --red: #fb7185;
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: radial-gradient(circle at 80% 0%, #172b49 0, var(--bg) 42rem); color: var(--text); min-height: 100vh; }
+button, input, textarea, select { font: inherit; }
+button { cursor: pointer; }
+button:disabled { opacity: .45; cursor: not-allowed; }
+.topbar { max-width: 1100px; margin: 0 auto; padding: 32px 24px 22px; display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+h1 { margin: 3px 0 0; font-size: clamp(1.55rem, 4vw, 2.15rem); letter-spacing: -.04em; }
+h2 { margin: 3px 0 0; font-size: 1.15rem; }
+.eyebrow { margin: 0; color: var(--blue); font-size: .68rem; font-weight: 800; letter-spacing: .16em; }
+.container { max-width: 1100px; margin: 0 auto; padding: 0 24px 36px; }
+.panel { background: rgba(17, 27, 46, .92); border: 1px solid var(--line); border-radius: 18px; padding: 22px; box-shadow: 0 16px 40px #0002; }
+.section-heading { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 18px; }
+.connection-controls { display: flex; align-items: end; gap: 12px; flex-wrap: wrap; }
+.field { display: flex; flex-direction: column; gap: 7px; min-width: 0; color: var(--muted); font-size: .82rem; font-weight: 650; }
+.field input, .field textarea, .field select, select, input, textarea { width: 100%; color: var(--text); background: #0b1425; border: 1px solid #34445e; border-radius: 10px; padding: 11px 12px; outline: none; }
+.field input:focus, .field textarea:focus, .field select:focus { border-color: var(--blue); box-shadow: 0 0 0 3px #60a5fa22; }
+.field textarea { resize: vertical; line-height: 1.5; }
+.connection-controls .field:first-child { width: 175px; }
+.connection-controls .grow { flex: 1; min-width: 230px; }
+.button { border: 1px solid transparent; border-radius: 10px; padding: 10px 15px; font-weight: 750; transition: transform .12s, filter .12s; white-space: nowrap; }
+.button:hover:not(:disabled) { filter: brightness(1.12); transform: translateY(-1px); }
+.button.primary { background: #2563eb; color: white; }
+.button.secondary { background: #1b2a42; border-color: #34445e; color: var(--text); }
+.button.danger { background: #4b1f31; border-color: #7f2944; color: #fecdd3; }
+.button.approve { background: #124b3e; border-color: #16745c; color: #a7f3d0; }
+.hint { color: var(--muted); font-size: .78rem; line-height: 1.55; margin: 13px 0 0; }
+.pill { display: inline-flex; align-items: center; border-radius: 999px; padding: 5px 10px; font-size: .72rem; font-weight: 800; white-space: nowrap; }
+.pill.neutral { color: #cbd5e1; background: #334155; }
+.pill.success { color: #a7f3d0; background: #064e3b; }
+.pill.warning { color: #fde68a; background: #713f12; }
+.pill.error { color: #fecdd3; background: #881337; }
+.list-section { margin-top: 30px; }
+.list-heading { margin-bottom: 13px; }
+.count { display: inline-flex; vertical-align: 2px; align-items: center; justify-content: center; min-width: 24px; height: 24px; padding: 0 7px; border-radius: 999px; background: #1d3556; color: #bfdbfe; font-size: .75rem; }
+.toolbar { display: flex; gap: 9px; }
+.message { min-height: 0; color: var(--muted); font-size: .82rem; }
+.message:not(:empty) { padding: 10px 12px; margin-bottom: 12px; background: #172338; border-radius: 9px; }
+.message.error { color: #fda4af; }
+.message.success { color: #6ee7b7; }
+.request-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 310px), 1fr)); gap: 14px; }
+.request-card { min-width: 0; background: rgba(17, 27, 46, .92); border: 1px solid var(--line); border-radius: 15px; padding: 17px; }
+.card-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; }
+.request-id { font-size: 1.02rem; font-weight: 850; overflow-wrap: anywhere; }
+.meta-label { display: block; color: var(--muted); font-size: .68rem; font-weight: 800; letter-spacing: .08em; margin: 16px 0 5px; }
+.purpose { font-size: .9rem; overflow-wrap: anywhere; }
+.command { margin: 0; padding: 11px; border-radius: 9px; background: #091322; border: 1px solid #24334a; white-space: pre-wrap; overflow-wrap: anywhere; font-size: .78rem; line-height: 1.5; color: #c7d8ee; max-height: 150px; overflow: auto; }
+.card-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 15px; }
+.card-actions .button { flex: 1; min-width: 75px; padding: 8px 10px; font-size: .76rem; }
+.empty-state { grid-column: 1 / -1; border: 1px dashed #3a4b64; border-radius: 15px; padding: 36px 18px; text-align: center; display: grid; gap: 8px; color: var(--muted); }
+.empty-state strong { color: var(--text); }
+.data-panel { margin-top: 28px; }
+pre { margin: 0; padding: 14px; border-radius: 10px; background: #091322; border: 1px solid #24334a; color: #bfdbfe; font-size: .78rem; overflow: auto; }
+.dialog { width: min(560px, calc(100% - 28px)); padding: 0; color: var(--text); background: var(--panel); border: 1px solid var(--line); border-radius: 18px; box-shadow: 0 24px 80px #0009; }
+.dialog::backdrop { background: #020617bb; backdrop-filter: blur(4px); }
+.dialog form { padding: 22px; display: grid; gap: 15px; }
+.dialog-heading { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 2px; }
+.icon-button { width: 34px; height: 34px; border: 1px solid var(--line); border-radius: 9px; background: var(--panel-soft); color: var(--text); font-size: 1.35rem; }
+.dialog-actions { display: flex; justify-content: flex-end; gap: 9px; margin-top: 3px; }
+footer { max-width: 1100px; margin: 0 auto; padding: 0 24px 28px; display: flex; justify-content: space-between; color: #71829b; font-size: .72rem; }
+@media (max-width: 650px) {
+  .topbar { padding: 24px 16px 18px; }
+  .container { padding: 0 16px 28px; }
+  .panel { padding: 17px; }
+  .connection-controls { align-items: stretch; }
+  .connection-controls .field:first-child, .connection-controls .grow { width: 100%; min-width: 100%; }
+  .connection-controls > button { flex: 1; }
+  .list-heading { align-items: flex-start; flex-direction: column; }
+  .toolbar { width: 100%; }
+  .toolbar .button { flex: 1; }
+  footer { padding: 0 16px 22px; }
+}
