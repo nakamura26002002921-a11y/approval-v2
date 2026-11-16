@@ -1,51 +1,60 @@
-# Orchestrator Manager (Pyodide + PWA)
+# Orchestrator Manager PWA
 
-## 概要
-GitHub Pages上で動作する、Flask `server.py` 用のリクエスト管理クライアントです。PythonのAPI呼び出し処理はPyodide上の `main.py` で実行します。
+## 今回の変更
+- Pyodideを通信経路から外し、ブラウザ標準の `fetch()` でHTTP通信する構成に変更
+- 接続確認は `GET /` を使用。サーバーが `{"name":"orchestrator_server","status":"ok"}` を返すことを確認
+- ハンドシェイク成功後にだけ `GET /api/requests` を実行
+- 接続失敗時は画面にエラーと確認項目を表示
+- 白背景・濃い文字に変更
+- 追加・編集（PUT）・承認・削除に対応
+- APIレスポンスはService Workerにキャッシュしない
 
-## ファイル
-- `index.html`: 画面
-- `style.css`: デザイン
-- `app.js`: UI、Pyodide起動、画面更新
-- `main.py`: Pyodideから実行するAPIクライアント
-- `manifest.json`: PWA設定
-- `service-worker.js`: アプリシェルのキャッシュ
-- `icons/icon.svg`: アプリアイコン
+## 配置
+このフォルダーの中身をGitHub Pagesの公開対象へ配置してください。GitHub PagesのHTTPSで利用できます。
 
-## GitHub Pagesへの配置
-1. このフォルダ内のファイルをGitHubリポジトリの公開対象ディレクトリ（例: `docs/`）へ配置します。
-2. GitHubリポジトリの Settings → Pages で公開元を設定します。
-3. PagesのHTTPS URLを開きます。
-4. 初回はインターネット接続下でPyodideを読み込みます。
+## 接続先
+- SSHポートフォワードを利用する場合：`http://127.0.0.1:5000`
+- LAN直結の場合：`http://サーバーのLAN-IP:5000`（HTTPSページからHTTPのLAN IPへ接続すると、ブラウザに遮断されることがあります）
 
-## サーバー起動
+SSHトンネル例（手元PCで実行）：
 
-### Cloudflare
 ```bash
-python3 server.py
+ssh -N -L 5000:127.0.0.1:5000 biostr1@SSH接続先
 ```
-Cloudflare Tunnelは別途起動し、発行されたHTTPS URLをクライアントのCloudflare URL欄に入力します。
 
-### LAN
-```bash
-python3 server.py --net-port "0.0.0.0:5000"
+計算サーバー側ではFlaskを `127.0.0.1:5000` で起動します。
+
+## server.py 側で必要な設定
+
+ブラウザからの通信にはCORSが必要です。既に `CORS(app)` を使っている場合でも、Private Network Accessの許可ヘッダーが必要になるブラウザ環境があります。Flaskアプリ作成後に以下を追加してください。
+
+```python
+# server.py に追加する設定例
+@app.after_request
+def add_browser_access_headers(response):
+    response.headers["Access-Control-Allow-Private-Network"] = "true"
+    response.headers["Access-Control-Allow-Headers"] = "Content-Type"
+    response.headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, OPTIONS"
+    return response
 ```
-クライアントにはサーバーPCのLANアドレス（例: `192.168.1.10:5000`）を入力します。
 
-## LAN接続時のブラウザ制約
-GitHub PagesはHTTPSです。HTTPSページから `http://192.168.x.x:5000` のようなHTTP APIへアクセスすると、ブラウザのMixed Content制約やPrivate Network Access等によりブロックされる場合があります。一般的なブラウザでは、LAN側APIをHTTPS化し、ブラウザが信頼する証明書を設定する必要があります。単にFlaskを `0.0.0.0` で待ち受けるだけでは、GitHub PagesからのLAN接続が必ず成功するわけではありません。
+既存の `CORS(app)` は残してください。これはブラウザ側の制限を緩和するための設定であり、認証機能ではありません。インターネットに公開する場合は、APIキー等の認証とアクセス元制限を別途実装してください。
 
-## CORS
-現在の `server.py` は `CORS(app)` で全オリジンを許可しています。公開運用ではGitHub Pagesのオリジンに制限し、APIに認証を追加してください。承認・編集・削除APIは認証なしで呼び出せるため、信頼できるネットワーク内に限定してください。
+## API仕様
+- `GET /`：`{"name":"orchestrator_server","status":"ok"}` を返す
+- `GET /api/requests`：リクエスト一覧
+- `POST /api/requests`：`{"id":"...","purpose":"...","command":"..."}` を追加
+- `PUT /api/requests/<id>`：`{"purpose":"...","command":"..."}` を更新
+- `POST /api/requests/<id>/approve`：承認
+- `DELETE /api/requests/<id>`：削除
 
-## オフライン動作
-Service Workerは画面・CSS・JavaScript・Pythonソースをキャッシュします。オフライン時に画面シェルを開くことはできますが、Pyodide本体はCDNから読み込むため、初回起動やブラウザキャッシュ消去後のオフライン起動は保証されません。またAPI操作にはサーバー接続が必要です。
+## 重要：接続できない場合
+`Failed to fetch` は、HTTPエラー応答を受け取る前にブラウザが通信を遮断した場合にも発生します。画面に表示されるハンドシェイク失敗の案内を確認してください。
 
-## API対応
-- `GET /api/requests`
-- `POST /api/requests`
-- `PUT /api/requests/<id>`
-- `POST /api/requests/<id>/approve`
-- `DELETE /api/requests/<id>`
+1. まずPWAを開いて接続先に `http://127.0.0.1:5000` を入力し、「接続確認」を押します。
+2. 同じPCのブラウザで `http://127.0.0.1:5000/` を直接開けることを確認します。
+3. それでも失敗する場合は、ブラウザ開発者ツールのConsoleでCORS、Private Network Access、Mixed Contentのエラーを確認します。
+4. HTTPSのGitHub PagesからHTTPのLAN IPへ接続する構成は、ブラウザによって遮断されることがあります。その場合はAPIサーバーをHTTPS化するか、HTTPS対応の中継を使ってください。
 
-承認済みリクエストも編集・削除できます。新規登録はサーバー側の仕様どおり「承認待ち」で作成します。要求IDは作成後に変更できません（変更する場合は新しいIDで登録し、旧IDを削除してください）。
+## 注意
+この一式はコードを書き直したもので、実際の計算サーバー・ブラウザとの接続試験は行っていません。特にCORS/PNAの挙動はブラウザとサーバー設定に依存します。
